@@ -5,15 +5,18 @@ description = "python car obd diagnostics"
 readme = "README.md"
 
 dependencies = [
-    "wxpython"
-    "pyserial"
-    "numpy"
-    "tornado"
-    "pint"
+    "wxpython",
+    "pyserial",
+    "numpy",
+    "tornado",
+    "pint",
 ]
 
 [project.gui-scripts]
 pyobd = "pyobd:main"
+
+[tool.setuptools]
+packages = ["pyobd", "pyobd.odb"]
 
 [build-system]
 requires = ["setuptools>=43.0.0", "wheel"]
