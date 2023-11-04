@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 ############################################################################
 #
 # wxgui.py
@@ -50,7 +49,7 @@ import gc
 import traceback
 import wx
 #import pdb
-import obd_io  # OBD2 funcs
+from pyobd import obd_io
 import os  # os.environ
 #import decimal
 #import glob
@@ -65,14 +64,14 @@ import webbrowser  # open browser from python
 #from multiprocessing import Process
 #from multiprocessing import Queue
 
-from obd2_codes import pcodes
+from pyobd.obd2_codes import pcodes
 #from obd2_codes import ptest
 
 from wx.lib.mixins.listctrl import ListCtrlAutoWidthMixin
-import obd
+from pyobd import obd
 #from obd import OBDStatus
 
-from obd.utils import OBDStatus
+from pyobd.obd.utils import OBDStatus
 
 
 
@@ -351,7 +350,7 @@ class TestEvent(wx.PyEvent):
 
 
 # defines notification event for debug tracewindow
-from debugEvent import *
+from pyobd.debugEvent import *
 
 
 class MyApp(wx.App):
@@ -1587,7 +1586,7 @@ class MyApp(wx.App):
                 self.FAST = "FAST"
 
         self.frame = wx.Frame(None, -1, "pyOBD-II ver. 1.15")
-        ico = wx.Icon(resource_path('pyobd.ico'), wx.BITMAP_TYPE_ICO)
+        ico = wx.Icon(resource_path('./pyobd.ico'), wx.BITMAP_TYPE_ICO)
         self.frame.SetIcon(ico)
 
         EVT_RESULT(self, self.OnResult, EVT_RESULT_ID)
@@ -2062,7 +2061,7 @@ the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  0211
     def CodeLookup(self, e=None):
         id = 0
         diag = wx.Frame(None, id, title="Diagnostic Trouble Codes")
-        ico = wx.Icon(resource_path('pyobd.ico'), wx.BITMAP_TYPE_ICO)
+        ico = wx.Icon(resource_path('./pyobd.ico'), wx.BITMAP_TYPE_ICO)
         diag.SetIcon(ico)
         tree = wx.TreeCtrl(diag, id, style=wx.TR_HAS_BUTTONS)
 
@@ -2229,6 +2228,5 @@ the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  0211
         time.sleep(0.1)
         os._exit(0)
 
-
-app = MyApp(0)
-app.MainLoop()
+# app = MyApp(0)
+# app.MainLoop()
