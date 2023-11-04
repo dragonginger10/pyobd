@@ -43,12 +43,15 @@ from wx.lib import plot as wxplot
 #import numpy.oldnumeric as _Numeric
 
 #from wxplot import PlotCanvas, PlotGraphics, PolyLine, PolyMarker, PolySpline
-import gc
 #from pympler.tracker import SummaryTracker
 #tracker = SummaryTracker()
 import traceback
 import wx
 #import pdb
+import pyobd
+#from obd import OBDStatus
+
+from pyobd.obd.utils import OBDStatus
 from pyobd import obd_io
 import os  # os.environ
 #import decimal
@@ -68,11 +71,6 @@ from pyobd.obd2_codes import pcodes
 #from obd2_codes import ptest
 
 from wx.lib.mixins.listctrl import ListCtrlAutoWidthMixin
-from pyobd import obd
-#from obd import OBDStatus
-
-from pyobd.obd.utils import OBDStatus
-
 
 
 
@@ -393,9 +391,9 @@ class MyApp(wx.App):
                 wx.PostEvent(self._notify_window, DebugEvent([1, "Communication initialized..."]))
                 wx.PostEvent(self._notify_window, StatusEvent([0, 1, "Car connected!"]))
 
-                r = self.connection.connection.query(obd.commands.ELM_VERSION)
+                r = self.connection.connection.query(pyobd.obd.commands.ELM_VERSION)
                 self.ELMver = str(r.value)
-                r = self.connection.connection.query(obd.commands.ELM_VOLTAGE)
+                r = self.connection.connection.query(pyobd.obd.commands.ELM_VOLTAGE)
                 self.ELMvoltage = str(r.value)
                 wx.PostEvent(self._notify_window, StatusEvent([5, 1, str(self.ELMvoltage)]))
                 self.protocol = self.connection.connection.protocol_name()
@@ -404,7 +402,7 @@ class MyApp(wx.App):
                 wx.PostEvent(self._notify_window, StatusEvent([1, 1, str(self.protocol)]))
                 wx.PostEvent(self._notify_window, StatusEvent([3, 1, str(self.connection.connection.port_name())]))
                 try:
-                    r = self.connection.connection.query(obd.commands.VIN)
+                    r = self.connection.connection.query(pyobd.obd.commands.VIN)
                     if r.value != None:
                         self.VIN = r.value.decode()
                         wx.PostEvent(self._notify_window, StatusEvent([4, 1, str(self.VIN)]))
@@ -550,11 +548,11 @@ class MyApp(wx.App):
                     wx.PostEvent(self._notify_window, GraphsValueEvent([3, 1, self.current_command4.desc]))
 
                 if curstate == 0:  # show status tab
-                    s = self.connection.connection.query(obd.commands.RPM)
+                    s = self.connection.connection.query(pyobd.obd.commands.RPM)
                     if s.value == None:
                         reconnect()
                         continue
-                    r = self.connection.connection.query(obd.commands.ELM_VOLTAGE)
+                    r = self.connection.connection.query(pyobd.obd.commands.ELM_VOLTAGE)
                     self.ELMvoltage = str(r.value)
                     wx.PostEvent(self._notify_window, StatusEvent([5, 1, str(self.ELMvoltage)]))
 
@@ -562,7 +560,7 @@ class MyApp(wx.App):
 
                 elif curstate == 1:  # show tests tab
                     try:
-                        r = self.connection.connection.query(obd.commands[1][1])
+                        r = self.connection.connection.query(pyobd.obd.commands[1][1])
                         if r.value == None:
                             reconnect()
                             continue
@@ -674,25 +672,25 @@ class MyApp(wx.App):
 
                     try:
                         if misfire_cylinder_supported:
-                            r = self.connection.connection.query(obd.commands.MONITOR_MISFIRE_CYLINDER_1)
+                            r = self.connection.connection.query(pyobd.obd.commands.MONITOR_MISFIRE_CYLINDER_1)
                             result = r.value.MISFIRE_COUNT
                             if not result.is_null():
                                 wx.PostEvent(self._notify_window, TestEvent([15, 2, str(result.value)]))
                             else:
                                 wx.PostEvent(self._notify_window, TestEvent([15, 2, "Misfire count wasn't reported"]))
-                            r = self.connection.connection.query(obd.commands.MONITOR_MISFIRE_CYLINDER_2)
+                            r = self.connection.connection.query(pyobd.obd.commands.MONITOR_MISFIRE_CYLINDER_2)
                             result = r.value.MISFIRE_COUNT
                             if not result.is_null():
                                 wx.PostEvent(self._notify_window, TestEvent([16, 2, str(result.value)]))
                             else:
                                 wx.PostEvent(self._notify_window, TestEvent([16, 2, "Misfire count wasn't reported"]))
-                            r = self.connection.connection.query(obd.commands.MONITOR_MISFIRE_CYLINDER_3)
+                            r = self.connection.connection.query(pyobd.obd.commands.MONITOR_MISFIRE_CYLINDER_3)
                             result = r.value.MISFIRE_COUNT
                             if not result.is_null():
                                 wx.PostEvent(self._notify_window, TestEvent([17, 2, str(result.value)]))
                             else:
                                 wx.PostEvent(self._notify_window, TestEvent([17, 2, "Misfire count wasn't reported"]))
-                            r = self.connection.connection.query(obd.commands.MONITOR_MISFIRE_CYLINDER_4)
+                            r = self.connection.connection.query(pyobd.obd.commands.MONITOR_MISFIRE_CYLINDER_4)
                             result = r.value.MISFIRE_COUNT
                             if not result.is_null():
                                 wx.PostEvent(self._notify_window, TestEvent([18, 2, str(result.value)]))
@@ -727,7 +725,7 @@ class MyApp(wx.App):
                         sensor_list = []
                         counter = 0
                         first_time_sensors = False
-                        for command in obd.commands[1]:
+                        for command in pyobd.obd.commands[1]:
                             if command:
                                 if command.command not in (b"0100" , b"0101", b"0120", b"0140", b"0103", b"0102"):
                                     s = self.connection.connection.query(command)
@@ -763,13 +761,13 @@ class MyApp(wx.App):
                             counter = counter + 1
 
                 elif curstate == 3:  # show DTC tab
-                    s = self.connection.connection.query(obd.commands.RPM)
+                    s = self.connection.connection.query(pyobd.obd.commands.RPM)
                     if s.value == None:
                         reconnect()
                         continue
 
                     if self._notify_window.ThreadControl == 1:  # clear DTC
-                        r = self.connection.connection.query(obd.commands["CLEAR_DTC"])
+                        r = self.connection.connection.query(pyobd.obd.commands["CLEAR_DTC"])
 
                         if self._notify_window.ThreadControl == 666:  # before reset ThreadControl we must check if main thread did not want us to finish
                             break
@@ -789,13 +787,13 @@ class MyApp(wx.App):
                     if prevstate != 3:
 
                         wx.PostEvent(self._notify_window, DTCEvent(0))  # clear list
-                        r = self.connection.connection.query(obd.commands.GET_DTC)
+                        r = self.connection.connection.query(pyobd.obd.commands.GET_DTC)
                         DTCCODES = []
                         print ("DTCCODES:",r.value)
                         if r.value != None:
                             for dtccode in r.value:
                                 DTCCODES.append((dtccode[0], "Active", dtccode[1]))
-                        r = self.connection.connection.query(obd.commands.FREEZE_DTC)
+                        r = self.connection.connection.query(pyobd.obd.commands.FREEZE_DTC)
                         print ("FREEZECODES:",r.value)
                         if r.value != None:
                             dtccode = r.value
@@ -814,7 +812,7 @@ class MyApp(wx.App):
                         freezeframe_list = []
                         counter = 0
                         first_time_freezeframe = False
-                        for command in obd.commands[2]:
+                        for command in pyobd.obd.commands[2]:
                             if command:
                                 if command.command not in (b"0201", b"0251", b"0230"):
                                     s = self.connection.connection.query(command)
@@ -830,7 +828,7 @@ class MyApp(wx.App):
                     else:
                         counter = 0
                         for sens in freezeframe_list:
-                            for command in obd.commands[2]:
+                            for command in pyobd.obd.commands[2]:
                                 if command.command == sens[0]:
                                     s = self.connection.connection.query(command)
                                     if s.value == None:
@@ -863,7 +861,7 @@ class MyApp(wx.App):
                         prev_command = None
 
                         first_time_graph = False
-                        for command in obd.commands[1]:
+                        for command in pyobd.obd.commands[1]:
                             if command:
                                 if command.command not in (b"0100" , b"0101" , b"0102", b"0113" , b"011C", b"0120" , b"0121", b"0140", b"0103"):
                                     s = self.connection.connection.query(command)
@@ -871,7 +869,7 @@ class MyApp(wx.App):
                                         continue
                                     else:
                                         graph_commands.append(command)
-                        graph_commands.append(obd.commands.ELM_VOLTAGE)
+                        graph_commands.append(pyobd.obd.commands.ELM_VOLTAGE)
                         sensor_descriptions = []
                         #sensor_descriptions.append("None")
                         for command in graph_commands:
@@ -984,7 +982,7 @@ class MyApp(wx.App):
                         prev_command3 = None
                         prev_command4 = None
                         first_time_graphs = False
-                        for command in obd.commands[1]:
+                        for command in pyobd.obd.commands[1]:
                             if command:
                                 if command.command not in (b"0100" , b"0101" , b"0102", b"0113" , b"011C", b"0120" , b"0121", b"0140", b"0103"):
                                     s = self.connection.connection.query(command)
@@ -992,7 +990,7 @@ class MyApp(wx.App):
                                         continue
                                     else:
                                         graph_commands.append(command)
-                        graph_commands.append(obd.commands.ELM_VOLTAGE)
+                        graph_commands.append(pyobd.obd.commands.ELM_VOLTAGE)
                         sensor_descriptions = []
                         #sensor_descriptions.append("None")
                         for command in graph_commands:
@@ -1272,7 +1270,7 @@ class MyApp(wx.App):
                         #time.sleep(0.2)
 
                 elif curstate == 7:
-                    s = self.connection.connection.query(obd.commands.RPM)
+                    s = self.connection.connection.query(pyobd.obd.commands.RPM)
                     if s.value == None:
                         reconnect()
                         continue
@@ -2122,7 +2120,7 @@ the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  0211
 
         """scan for available ports. return a list of serial names"""
         available = []
-        available = obd.scan_serial()
+        available = pyobd.obd.scan_serial()
 
         return available
 
@@ -2131,7 +2129,7 @@ the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  0211
         diag = wx.Dialog(self.frame, id, title="Configure")
         sizer = wx.BoxSizer(wx.VERTICAL)
 
-        ports = obd.scan_serial()
+        ports = pyobd.obd.scan_serial()
         if ports == []:
             ports = ["AUTO"]
         else:
