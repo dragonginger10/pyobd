@@ -33,6 +33,10 @@
 
           format = "pyproject";
 
+          nativeBuildInputs = with pkgs.python310Packages; [
+            setuptools
+          ];
+
           propagatedBuildInputs = with pkgs.python310Packages; [
             wxPython_4_2
             numpy
