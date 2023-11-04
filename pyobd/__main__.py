@@ -1,5 +1,4 @@
-from pyobd.pyobd import MyApp
+from pyobd import main
 
 if __name__ == "__main__":
-    app = MyApp(0)
-    app.MainLoop()
+    main()
