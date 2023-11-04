@@ -1,0 +1,20 @@
+[project]
+name = "pyobd"
+version = "1.0.0"
+description = "python car obd diagnostics"
+readme = "README.md"
+
+dependencies = [
+    "wxpython"
+    "pyserial"
+    "numpy"
+    "tornado"
+    "pint"
+]
+
+[project.gui-scripts]
+pyobd = "pyobd:main"
+
+[build-system]
+requires = ["setuptools>=43.0.0", "wheel"]
+buidl-backend = "setuptools.build_meta"
