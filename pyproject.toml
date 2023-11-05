@@ -16,10 +16,14 @@ dependencies = [
 pyobd = "pyobd:main"
 
 [tool.setuptools]
-packages = ["pyobd", "pyobd.obd", "pyobd.obd.protocols"]
+#packages = ["pyobd", "pyobd.obd", "pyobd.obd.protocols"]
+include-package-data = true
 
-[options.package_data]
-pyobd = *.ico
+[tool.setuptools.packages.find]
+where = ["."]
+
+[tool.setuptools.package-data]
+pyobd = ["*.ico"]
 
 [build-system]
 requires = ["setuptools>=43.0.0", "wheel"]
