@@ -1584,7 +1584,7 @@ class MyApp(wx.App):
                 self.FAST = "FAST"
 
         self.frame = wx.Frame(None, -1, "pyOBD-II ver. 1.15")
-        ico = wx.Icon(resource_path('./pyobd.ico'), wx.BITMAP_TYPE_ICO)
+        ico = wx.Icon(resource_path('pyobd.ico'), wx.BITMAP_TYPE_ICO)
         self.frame.SetIcon(ico)
 
         EVT_RESULT(self, self.OnResult, EVT_RESULT_ID)
@@ -2059,7 +2059,7 @@ the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  0211
     def CodeLookup(self, e=None):
         id = 0
         diag = wx.Frame(None, id, title="Diagnostic Trouble Codes")
-        ico = wx.Icon(resource_path('./pyobd.ico'), wx.BITMAP_TYPE_ICO)
+        ico = wx.Icon(resource_path('pyobd.ico'), wx.BITMAP_TYPE_ICO)
         diag.SetIcon(ico)
         tree = wx.TreeCtrl(diag, id, style=wx.TR_HAS_BUTTONS)
 
