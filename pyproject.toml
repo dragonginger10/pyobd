@@ -27,4 +27,4 @@ pyobd = ["*.ico"]
 
 [build-system]
 requires = ["setuptools>=43.0.0", "wheel"]
-buidl-backend = "setuptools.build_meta"
+build-backend = "setuptools.build_meta"
